@@ -1,0 +1,7 @@
+C:\Users\Z3D\source\repos\testmotus\testmotus\bin\Debug\testmotus.exe.config
+C:\Users\Z3D\source\repos\testmotus\testmotus\bin\Debug\testmotus.exe
+C:\Users\Z3D\source\repos\testmotus\testmotus\bin\Debug\testmotus.pdb
+C:\Users\Z3D\source\repos\testmotus\testmotus\obj\Debug\testmotus.csprojAssemblyReference.cache
+C:\Users\Z3D\source\repos\testmotus\testmotus\obj\Debug\testmotus.csproj.CoreCompileInputs.cache
+C:\Users\Z3D\source\repos\testmotus\testmotus\obj\Debug\testmotus.exe
+C:\Users\Z3D\source\repos\testmotus\testmotus\obj\Debug\testmotus.pdb
