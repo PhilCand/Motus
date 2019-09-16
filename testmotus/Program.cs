@@ -6,11 +6,16 @@ class Program
 {
     static void Main()
     {
+        
         int score = 0;
+        string lireScore = File.ReadAllLines("high_score.txt")[0];
+        string[] tableauScore = lireScore.Split(';');
+        int highScore = int.Parse(tableauScore[1]);
+        string highName = tableauScore[0];
         bool recommencer = true;
 
         Console.WriteLine("_ _ _ _ _BIENVENUE SUR MOTUS_ _ _ _ _"); // Titre
-        Console.ForegroundColor = ConsoleColor.Green;               // Legende
+        Console.ForegroundColor = ConsoleColor.Green;               // Legende    
         Console.WriteLine("LETTRE BIEN PLACEE");
         Console.ResetColor();
         Console.ForegroundColor = ConsoleColor.Yellow;
@@ -19,6 +24,11 @@ class Program
         Console.ForegroundColor = ConsoleColor.Red;
         Console.WriteLine("LETTRE ABSENTE");
         Console.ResetColor();
+        Console.WriteLine();
+        Console.WriteLine($"Le meilleur score est détenu par {highName} avec {highScore} mot(s) trouvé(s)");
+        Console.WriteLine();
+        Console.Write("Entrez votre nom : ");
+        string nomJoueur = Console.ReadLine().ToUpper();
 
         do
         {
@@ -27,7 +37,7 @@ class Program
             int nbEssais = 0;
             Random rnd = new Random();
             int random = rnd.Next(0, listeDeMots.Length);
-            string motATrouver = listeDeMots[random].ToUpper();
+            string motATrouver = "AAAAAAAA"; //listeDeMots[random].ToUpper();
             string motSaisi = "";
             string resultat = "";
 
@@ -40,10 +50,11 @@ class Program
                 {
 
                     Console.WriteLine();
-                    Console.WriteLine();
-                    Console.WriteLine($"Il vous reste {tentativesMax - nbEssais} essai(s)");
+                    Console.WriteLine($"**Il vous reste {tentativesMax - nbEssais} essai(s)**");
                     Console.WriteLine();
                     Console.Write($"Saisissez un mot de 8 lettres commençant par {motATrouver[0]}: ");
+                    Console.WriteLine();
+
 
                     motSaisi = Console.ReadLine().ToUpper();
                     if (motSaisi.Length < motATrouver.Length)
@@ -128,7 +139,7 @@ class Program
                     motSaisi = "";
                     nbEssais = 0;
                     random = rnd.Next(0, listeDeMots.Length);
-                    motATrouver = listeDeMots[random].ToUpper();
+                    motATrouver = "AAAAAAAA"; // listeDeMots[random].ToUpper();
 
                 }
             }
@@ -137,6 +148,13 @@ class Program
             {
                 if (!recommencer)
                 {
+                    if (score > highScore)
+                    {
+                        Console.WriteLine();
+                        Console.WriteLine($"BRAVO ! avec {score} mot(s) trouvé(s), vous détenez le meilleur score");
+                        lireScore = (nomJoueur + ';' + score).ToString();
+                        File.WriteAllText("high_score.txt", lireScore);
+                    }
                     Console.WriteLine();
                     Console.WriteLine($"Le jeu est terminé, au total vous avez trouvé {score} mot(s).");
                     Console.WriteLine();
@@ -147,6 +165,14 @@ class Program
                     Console.WriteLine();
                     Console.WriteLine($"Le jeu est terminé, le mot était {motATrouver}, au total vous avez trouvé {score} mot(s).");
                     Console.WriteLine();
+
+                    if (score > highScore)
+                    {
+                        Console.WriteLine();
+                        Console.WriteLine($"BRAVO ! avec {score} mot(s) trouvé(s), vous détenez le meilleur score");
+                        lireScore = (nomJoueur + ';' + score).ToString();
+                        File.WriteAllText("high_score.txt", lireScore);
+                    }
                     Console.ReadKey();
                     recommencer = false;
                 }
