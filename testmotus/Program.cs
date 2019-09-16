@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Text;
 
 class Program
 {
@@ -44,7 +43,7 @@ class Program
             int nbEssais = 0;
             Random rnd = new Random();
             int random = rnd.Next(0, listeDeMots.Length);
-            string motATrouver = "AAAAAAAA"; //listeDeMots[random].ToUpper();
+            string motATrouver = listeDeMots[random].ToUpper();
             string motSaisi = "";
             string resultat = "";
 
@@ -68,18 +67,23 @@ class Program
                     {
                         Console.WriteLine();
                         Console.WriteLine("----Vous avez saisi moins de 8 lettres----");
-                        Console.WriteLine();
-                        nbEssais++;
+
                     }
-                    if (motSaisi.Length > motATrouver.Length)
+                    else if (motSaisi.Length > motATrouver.Length)
                     {
                         Console.WriteLine();
                         Console.WriteLine("----Vous avez saisi plus de 8 lettres----");
-                        Console.WriteLine();
-                        nbEssais++;
+
                     }
+                    else if (!Array.Exists(listeDeMots, element => element == motSaisi))
+                    {
+                        Console.WriteLine();
+                        Console.WriteLine("----Le mot saisi n'existe pas dans le dictionnaire----");
+
+                    }
+
                 }
-                while ((motSaisi.Length != motATrouver.Length) && (nbEssais < tentativesMax));
+                while ((motSaisi.Length != motATrouver.Length) || (!Array.Exists(listeDeMots, element => element == motSaisi)));
 
                 for (int i = 0; i < motSaisi.Length; i++) // boucle sur chaque lettre du mot saisie
                 {
@@ -146,7 +150,7 @@ class Program
                     motSaisi = "";
                     nbEssais = 0;
                     random = rnd.Next(0, listeDeMots.Length);
-                    motATrouver = "AAAAAAAA"; // listeDeMots[random].ToUpper();
+                    motATrouver = listeDeMots[random].ToUpper();
 
                 }
             }
