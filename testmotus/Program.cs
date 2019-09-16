@@ -8,10 +8,17 @@ class Program
     {
         
         int score = 0;
-        string lireScore = File.ReadAllLines("high_score.txt")[0];
-        string[] tableauScore = lireScore.Split(';');
-        int highScore = int.Parse(tableauScore[1]);
-        string highName = tableauScore[0];
+        string highName="";
+        int highScore = 0;
+        string lireScore = "";
+
+        if (File.Exists("high_score.txt"))
+        {
+            lireScore = File.ReadAllLines("high_score.txt")[0];
+            string[] tableauScore = lireScore.Split(';');
+            highScore = int.Parse(tableauScore[1]);
+            highName = tableauScore[0];
+        }        
         bool recommencer = true;
 
         Console.WriteLine("_ _ _ _ _BIENVENUE SUR MOTUS_ _ _ _ _"); // Titre
@@ -25,7 +32,7 @@ class Program
         Console.WriteLine("LETTRE ABSENTE");
         Console.ResetColor();
         Console.WriteLine();
-        Console.WriteLine($"Le meilleur score est détenu par {highName} avec {highScore} mot(s) trouvé(s)");
+        if (File.Exists("high_score.txt")) Console.WriteLine($"Le meilleur score est détenu par {highName} avec {highScore} mot(s) trouvé(s)");
         Console.WriteLine();
         Console.Write("Entrez votre nom : ");
         string nomJoueur = Console.ReadLine().ToUpper();
@@ -53,7 +60,7 @@ class Program
                     Console.WriteLine($"**Il vous reste {tentativesMax - nbEssais} essai(s)**");
                     Console.WriteLine();
                     Console.Write($"Saisissez un mot de 8 lettres commençant par {motATrouver[0]}: ");
-                    Console.WriteLine();
+                   
 
 
                     motSaisi = Console.ReadLine().ToUpper();
@@ -166,7 +173,7 @@ class Program
                     Console.WriteLine($"Le jeu est terminé, le mot était {motATrouver}, au total vous avez trouvé {score} mot(s).");
                     Console.WriteLine();
 
-                    if (score > highScore)
+                    if ((score > highScore) || (!File.Exists("high_score.txt")))
                     {
                         Console.WriteLine();
                         Console.WriteLine($"BRAVO ! avec {score} mot(s) trouvé(s), vous détenez le meilleur score");
