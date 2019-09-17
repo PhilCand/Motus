@@ -1,23 +1,27 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 class Program
 {
     static void Main()
     {
-        
-        int score = 0;
-        string highName="";
-        int highScore = 0;
-        string lireScore = "";
 
-        if (File.Exists("high_score.txt"))                          // Si le fichier de score existe on recupere le meilleur score
+        int score = 0;
+        var scoresList = new Dictionary<string, int>();
+
+        if (File.Exists("high_scores.txt"))                          // Si le fichier de score existe on recupere le meilleur score
         {
-            lireScore = File.ReadAllLines("high_score.txt")[0];
-            string[] tableauScore = lireScore.Split(';');
-            highScore = int.Parse(tableauScore[1]);
-            highName = tableauScore[0];
-        }        
+            string[] tableauScore = File.ReadAllLines("high_scores.txt");
+            foreach (string ligneScore in tableauScore)
+            {
+                scoresList.Add(ligneScore.Split(';')[0], int.Parse(ligneScore.Split(';')[1]));
+            }
+
+            
+        }
+
         bool recommencer = true;
 
         Console.WriteLine("_ _ _ _ _BIENVENUE SUR MOTUS_ _ _ _ _"); // Titre
@@ -31,11 +35,13 @@ class Program
         Console.WriteLine("LETTRE ABSENTE");
         Console.ResetColor();
         Console.WriteLine();
-        if (File.Exists("high_score.txt")) Console.WriteLine($"Le meilleur score est détenu par {highName} avec {highScore} mot(s) trouvé(s)"); // Si le fichier existe on affiche le meilleur score
-        Console.WriteLine();
         Console.Write("Entrez votre nom : ");                       // Saisie nom du joueur
         string nomJoueur = Console.ReadLine().ToUpper();
-
+        int bestScore = 0;
+        scoresList.TryGetValue(nomJoueur, out bestScore);
+        Console.WriteLine();
+        Console.WriteLine($"Bonjour {nomJoueur}, votre meilleur score est de {bestScore}.");
+        
         do                                                         // boucle principale tant que (recommencer = true)
         {
             string[] listeDeMots = File.ReadAllLines("FR.txt");
@@ -59,7 +65,7 @@ class Program
                     Console.WriteLine($"**Il vous reste {tentativesMax - nbEssais} essai(s)**");
                     Console.WriteLine();
                     Console.Write($"Saisissez un mot de 8 lettres commençant par {motATrouver[0]}: ");
-                   
+
                     motSaisi = Console.ReadLine().ToUpper();
 
                     if (motSaisi.Length < motATrouver.Length)
@@ -116,7 +122,7 @@ class Program
                 nbEssais++;
                 resultat = motSaisi;
 
-                if (resultat == motATrouver)                        //si le resultat est correct on propose de recommencer.
+                if (resultat == motATrouver)                        //si le resultat est correct on propose de continuer.
                 {
                     Console.WriteLine();
                     Console.WriteLine("*************************************************************");
@@ -128,7 +134,7 @@ class Program
 
                     while (true)
                     {
-                        Console.Write("Voulez vous continuer ? OUI / NON : ");
+                        Console.Write("Continuer ? OUI / NON : ");
                         string retry = Console.ReadLine();
                         if (retry.ToUpper() == "OUI")
                         {
@@ -154,15 +160,11 @@ class Program
             {
                 if (!recommencer)                               // Si le joueur a gagné mais ne veut pas recommencer
                 {
-                    if (score > highScore)
-                    {
-                        Console.WriteLine();
-                        Console.WriteLine($"BRAVO ! avec {score} mot(s) trouvé(s), vous détenez le meilleur score");
-                        lireScore = (nomJoueur + ';' + score).ToString();
-                        File.WriteAllText("high_score.txt", lireScore);
-                    }
+
                     Console.WriteLine();
                     Console.WriteLine($"Le jeu est terminé, au total vous avez trouvé {score} mot(s).");
+                    AjouterScore();
+                    AfficherScore();
                     Console.WriteLine();
                     Console.ReadKey();
                 }
@@ -170,41 +172,74 @@ class Program
                 {
                     Console.WriteLine();
                     Console.WriteLine($"Le jeu est terminé, le mot était {motATrouver}, au total vous avez trouvé {score} mot(s).");
+                    AjouterScore();
+                    AfficherScore();
                     Console.WriteLine();
 
-                    if (score > highScore)
+                }
+                while (true)
+                {
+                    Console.WriteLine();
+                    Console.Write("Recommencer ? OUI / NON : ");
+                    string retry = Console.ReadLine();
+                    if (retry.ToUpper() == "OUI")
                     {
-                        Console.WriteLine();
-                        Console.WriteLine($"BRAVO ! avec {score} mot(s) trouvé(s), vous détenez le meilleur score");
-                        lireScore = (nomJoueur + ';' + score).ToString();
-                        File.WriteAllText("high_score.txt", lireScore);
+                        recommencer = true;
+                        motSaisi = "";                              // on réinitialise les données + le score
+                        nbEssais = 0;
+                        score = 0;
+                        random = rnd.Next(0, listeDeMots.Length);
+                        motATrouver = listeDeMots[random].ToUpper();
+                        break;
                     }
-                    while (true)
+                    if (retry.ToUpper() == "NON")
                     {
-                        Console.WriteLine();
-                        Console.Write("Voulez vous recommencer ? OUI / NON : ");
-                        string retry = Console.ReadLine();
-                        if (retry.ToUpper() == "OUI")
-                        {
-                            recommencer = true;
-                            motSaisi = "";                              // on réinitialise les données + le score
-                            nbEssais = 0;
-                            score = 0;
-                            random = rnd.Next(0, listeDeMots.Length);
-                            motATrouver = listeDeMots[random].ToUpper();
-                            break;
-                        }
-                        if (retry.ToUpper() == "NON")
-                        {
-                            Console.ReadKey();
-                            recommencer = false;
-                            break;
-                        }
+                        Console.ReadKey();
+                        recommencer = false;
+                        break;
                     }
                 }
             }
+
         }
         while (recommencer);
+
+        void AfficherScore()
+        {
+            Console.WriteLine("TABLEAU DES SCORES");
+            Console.WriteLine("-------------------");
+            Console.WriteLine("P - Joueur - Score");
+
+            var myList = scoresList.ToList();
+            myList.Sort((pair1, pair2) => pair1.Value.CompareTo(pair2.Value));
+            for (int i = myList.Count - 1; i >= 0; i--)
+            {
+
+                Console.WriteLine($"{scoresList.Count - i} - {myList[i].Key} - {myList[i].Value}");
+            }
+        }
+
+        void AjouterScore()
+        {
+            if ((scoresList.ContainsKey(nomJoueur)) && (score > bestScore))
+            {
+                scoresList.Remove(nomJoueur);
+                scoresList.Add(nomJoueur, score);
+            }
+            
+            if (!scoresList.ContainsKey(nomJoueur))
+                scoresList.Add(nomJoueur, score);
+            var myList = scoresList.ToList();
+            myList.Sort((pair1, pair2) => pair1.Value.CompareTo(pair2.Value));
+            string[] majScores = new string[scoresList.Count];
+            for (int i = myList.Count - 1; i >= 0; i--)
+            {
+                majScores[scoresList.Count - i - 1] = myList[i].Key + ";" + myList[i].Value;
+            }
+
+            File.WriteAllLines("high_scores.txt", majScores);
+        }
+
     }
 }
 
